@@ -43,37 +43,40 @@ let pages = [];
 
 async function getPages() {
 
-const apiURL =
-    `https://api.github.com/repos/` +
-    `${GITHUB_USERNAME}/` +
-    `${GITHUB_REPOSITORY}/contents/` +
-    `${PAGES_FOLDER}?ref=${GITHUB_BRANCH}`;
+async function fetchFolderContents(branchName) {
+    const apiURL =
+        `https://api.github.com/repos/` +
+        `${GITHUB_USERNAME}/` +
+        `${GITHUB_REPOSITORY}/contents/` +
+        `${PAGES_FOLDER}?ref=${branchName}`;
 
+    const response = await fetch(apiURL, { cache: "no-store" });
 
-const response = await fetch(apiURL);
+    if (!response.ok) {
+        if (response.status === 404) {
+            return null;
+        }
 
+        if (response.status === 403) {
+            throw new Error("GitHub API Rate Limit erreicht.");
+        }
 
-if (!response.ok) {
-
-    if (response.status === 404) {
-        throw new Error(
-            `Der Ordner "${PAGES_FOLDER}" wurde nicht gefunden.`
-        );
+        throw new Error(`GitHub API Fehler: ${response.status}`);
     }
 
-    if (response.status === 403) {
-        throw new Error(
-            "GitHub API Rate Limit erreicht."
-        );
-    }
-
-    throw new Error(
-        `GitHub API Fehler: ${response.status}`
-    );
+    return await response.json();
 }
 
+let entries = await fetchFolderContents(GITHUB_BRANCH);
 
-const entries = await response.json();
+if (!entries && GITHUB_BRANCH === "main") {
+    entries = await fetchFolderContents("master");
+}
+
+if (!entries) {
+    throw new Error(`Der Ordner "${PAGES_FOLDER}" wurde nicht gefunden.`);
+}
+
 const pages = [];
 
 
@@ -98,7 +101,7 @@ for (const entry of entries) {
 
 
     const folderResponse =
-        await fetch(folderURL);
+        await fetch(folderURL, { cache: "no-store" });
 
 
     if (!folderResponse.ok) {
