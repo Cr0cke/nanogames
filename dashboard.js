@@ -34,8 +34,55 @@ const retryButton = document.getElementById("retryButton");
 
 const lastUpdated = document.getElementById("lastUpdated");
 
+const STORAGE_KEY = "nanogames.cachedPages";
+const CACHE_TTL_MS = 10 * 60 * 1000;
+const REFRESH_COOLDOWN_MS = 2500;
+
 // Alle gefundenen Seiten
 let pages = [];
+let lastRefreshRequest = 0;
+
+function readCachedPages() {
+    try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+
+        if (!raw) {
+            return null;
+        }
+
+        const cached = JSON.parse(raw);
+
+        if (!cached || !Array.isArray(cached.pages) || typeof cached.timestamp !== "number") {
+            return null;
+        }
+
+        const age = Date.now() - cached.timestamp;
+
+        if (age > CACHE_TTL_MS) {
+            window.localStorage.removeItem(STORAGE_KEY);
+            return null;
+        }
+
+        return cached.pages;
+    } catch (error) {
+        console.warn("LocalStorage konnte nicht gelesen werden.", error);
+        return null;
+    }
+}
+
+function saveCachedPages(pageList) {
+    try {
+        window.localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify({
+                timestamp: Date.now(),
+                pages: pageList
+            })
+        );
+    } catch (error) {
+        console.warn("LocalStorage konnte nicht gespeichert werden.", error);
+    }
+}
 
 // ==========================================
 // GitHub API
@@ -203,10 +250,31 @@ function cleanFileName(fileName) {
 // Seiten laden
 // ==========================================
 
-async function loadPages() {
+async function loadPages({ force = false } = {}) {
     showLoading();
 
     try {
+        if (!force) {
+            const cachedPages = readCachedPages();
+
+            if (cachedPages && cachedPages.length > 0) {
+                pages = cachedPages;
+                renderPages(pages);
+                updatePageCount();
+
+                lastUpdated.textContent =
+                    "Zuletzt aktualisiert: " +
+                    new Date().toLocaleTimeString(
+                        "de-DE",
+                        {
+                            hour: "2-digit",
+                            minute: "2-digit"
+                        }
+                    );
+                return;
+            }
+        }
+
         const files = await getPages();
 
         if (files.length === 0) {
@@ -230,6 +298,7 @@ async function loadPages() {
             )
         );
 
+        saveCachedPages(pages);
         renderPages(pages);
         updatePageCount();
 
@@ -244,6 +313,16 @@ async function loadPages() {
             );
     } catch (error) {
         console.error(error);
+
+        const cachedPages = readCachedPages();
+
+        if (cachedPages && cachedPages.length > 0) {
+            pages = cachedPages;
+            renderPages(pages);
+            updatePageCount();
+            return;
+        }
+
         showError(error.message);
     }
 }
@@ -392,11 +471,41 @@ function showError(message) {
 // Buttons
 // ==========================================
 
-refreshButton.addEventListener("click", loadPages);
-retryButton.addEventListener("click", loadPages);
+refreshButton.addEventListener("click", () => {
+    const now = Date.now();
+
+    if (now - lastRefreshRequest < REFRESH_COOLDOWN_MS) {
+        return;
+    }
+
+    lastRefreshRequest = now;
+    loadPages();
+});
+
+retryButton.addEventListener("click", () => {
+    lastRefreshRequest = Date.now();
+    loadPages({ force: true });
+});
 
 // ==========================================
 // Start
 // ==========================================
 
-loadPages();
+const cachedPages = readCachedPages();
+
+if (cachedPages && cachedPages.length > 0) {
+    pages = cachedPages;
+    renderPages(pages);
+    updatePageCount();
+    lastUpdated.textContent =
+        "Zuletzt lokal gespeichert: " +
+        new Date().toLocaleTimeString(
+            "de-DE",
+            {
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+} else {
+    loadPages();
+}
