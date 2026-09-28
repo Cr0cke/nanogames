@@ -74,24 +74,27 @@ if (!response.ok) {
 
 
 const entries = await response.json();
-
 const pages = [];
 
 
-// Nur die direkten Unterordner von "pages/"
-const folders = entries.filter(entry =>
-    entry.type === "dir"
-);
+for (const entry of entries) {
+    if (entry.type === "file" && entry.name.toLowerCase().endsWith(".html")) {
+        pages.push({
+            ...entry,
+            folderName: null
+        });
+        continue;
+    }
 
-
-// Jeden Unterordner durchsuchen
-for (const folder of folders) {
+    if (entry.type !== "dir") {
+        continue;
+    }
 
     const folderURL =
         `https://api.github.com/repos/` +
         `${GITHUB_USERNAME}/` +
         `${GITHUB_REPOSITORY}/contents/` +
-        `${folder.path}?ref=${GITHUB_BRANCH}`;
+        `${entry.path}?ref=${GITHUB_BRANCH}`;
 
 
     const folderResponse =
@@ -107,7 +110,6 @@ for (const folder of folders) {
         await folderResponse.json();
 
 
-    // Nur index.html akzeptieren
     const indexFile =
         folderContents.find(file =>
             file.type === "file" &&
@@ -116,16 +118,11 @@ for (const folder of folders) {
 
 
     if (indexFile) {
-
         pages.push({
             ...indexFile,
-
-            // Ordnername speichern
-            folderName: folder.name
+            folderName: entry.name
         });
-
     }
-
 }
 
 
