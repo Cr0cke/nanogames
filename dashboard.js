@@ -11,7 +11,7 @@ const GITHUB_USERNAME = "Cr0cke";
 const GITHUB_REPOSITORY = "nanogames";
 
 // Ordner mit den HTML-Dateien
-const PAGES_FOLDER = "pages";
+const PAGES_FOLDER = "games";
 
 // GitHub Branch
 const GITHUB_BRANCH = "main";
@@ -42,40 +42,95 @@ let pages = [];
 // ==========================================
 
 async function getPages() {
-    const apiURL =
-        `https://api.github.com/repos/` +
-        `${GITHUB_USERNAME}/` +
-        `${GITHUB_REPOSITORY}/contents/` +
-        `${PAGES_FOLDER}?ref=${GITHUB_BRANCH}`;
 
-    const response = await fetch(apiURL);
+const apiURL =
+    `https://api.github.com/repos/` +
+    `${GITHUB_USERNAME}/` +
+    `${GITHUB_REPOSITORY}/contents/` +
+    `${PAGES_FOLDER}?ref=${GITHUB_BRANCH}`;
 
-    if (!response.ok) {
-        if (response.status === 404) {
-            throw new Error(
-                "Repository oder pages-Ordner wurde nicht gefunden."
-            );
-        }
 
-        if (response.status === 403) {
-            throw new Error(
-                "GitHub API Rate Limit erreicht."
-            );
-        }
+const response = await fetch(apiURL);
 
+
+if (!response.ok) {
+
+    if (response.status === 404) {
         throw new Error(
-            `GitHub API Fehler: ${response.status}`
+            `Der Ordner "${PAGES_FOLDER}" wurde nicht gefunden.`
         );
     }
 
-    const files = await response.json();
-
-    return files.filter(file => {
-        return (
-            file.type === "file" &&
-            file.name.toLowerCase().endsWith(".html")
+    if (response.status === 403) {
+        throw new Error(
+            "GitHub API Rate Limit erreicht."
         );
-    });
+    }
+
+    throw new Error(
+        `GitHub API Fehler: ${response.status}`
+    );
+}
+
+
+const entries = await response.json();
+
+const pages = [];
+
+
+// Nur die direkten Unterordner von "pages/"
+const folders = entries.filter(entry =>
+    entry.type === "dir"
+);
+
+
+// Jeden Unterordner durchsuchen
+for (const folder of folders) {
+
+    const folderURL =
+        `https://api.github.com/repos/` +
+        `${GITHUB_USERNAME}/` +
+        `${GITHUB_REPOSITORY}/contents/` +
+        `${folder.path}?ref=${GITHUB_BRANCH}`;
+
+
+    const folderResponse =
+        await fetch(folderURL);
+
+
+    if (!folderResponse.ok) {
+        continue;
+    }
+
+
+    const folderContents =
+        await folderResponse.json();
+
+
+    // Nur index.html akzeptieren
+    const indexFile =
+        folderContents.find(file =>
+            file.type === "file" &&
+            file.name.toLowerCase() === "index.html"
+        );
+
+
+    if (indexFile) {
+
+        pages.push({
+            ...indexFile,
+
+            // Ordnername speichern
+            folderName: folder.name
+        });
+
+    }
+
+}
+
+
+return pages;
+
 }
 
 // ==========================================
@@ -109,14 +164,14 @@ async function getPageInformation(file) {
             name: file.name,
             title: title,
             description: description,
-            url: createPageURL(file.name)
+            url: createPageURL(file.path)
         };
     } catch (error) {
         return {
             name: file.name,
             title: cleanFileName(file.name),
             description: "Diese Webseite öffnen.",
-            url: createPageURL(file.name)
+            url: createPageURL(file.path)
         };
     }
 }
@@ -125,8 +180,12 @@ async function getPageInformation(file) {
 // URL erstellen
 // ==========================================
 
-function createPageURL(fileName) {
-    return `${PAGES_FOLDER}/${encodeURIComponent(fileName)}`;
+function createPageURL(filePath) {
+    return filePath
+        .split("/")
+        .map(part => encodeURIComponent(part))
+        .join("/");
+
 }
 
 // ==========================================
