@@ -1,20 +1,20 @@
 :root {
-  --background: #070b14;
-  --background-2: #0f1729;
-  --panel: rgba(15, 23, 41, 0.88);
-  --panel-strong: #111827;
-  --card: #131d2d;
-  --card-hover: #18263d;
-  --border: rgba(118, 208, 255, 0.2);
-  --border-strong: rgba(118, 208, 255, 0.45);
-  --text: #edf7ff;
-  --text-muted: #9bb3c9;
-  --accent: #6ee7ff;
-  --accent-2: #7c4dff;
-  --accent-3: #38e29d;
+  --background: #05080b;
+  --background-2: #0d1117;
+  --panel: rgba(12, 15, 18, 0.88);
+  --panel-strong: #0a0d10;
+  --card: #11171b;
+  --card-hover: #171d23;
+  --border: rgba(46, 217, 157, 0.22);
+  --border-strong: rgba(46, 217, 157, 0.48);
+  --text: #edfdf7;
+  --text-muted: #a6bdb1;
+  --accent: #2ed99d;
+  --accent-2: #1ebf88;
+  --accent-3: #0f5d45;
   --danger: #ff5f7a;
-  --glow: rgba(110, 231, 255, 0.42);
-  --shadow: rgba(8, 12, 22, 0.7);
+  --glow: rgba(46, 217, 157, 0.42);
+  --shadow: rgba(0, 0, 0, 0.72);
 }
 
 * {
@@ -30,9 +30,9 @@ html {
 body {
   min-height: 100vh;
   background:
-    radial-gradient(circle at top, rgba(124, 77, 255, 0.22), transparent 30%),
-    radial-gradient(circle at right, rgba(56, 226, 157, 0.11), transparent 25%),
-    linear-gradient(180deg, #050914 0%, #0b1220 100%);
+    radial-gradient(circle at top, rgba(46, 217, 157, 0.18), transparent 30%),
+    radial-gradient(circle at right, rgba(46, 217, 157, 0.08), transparent 25%),
+    linear-gradient(180deg, #040607 0%, #0b1014 100%);
   color: var(--text);
   font-family: Inter, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -44,8 +44,8 @@ body::before {
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(rgba(110, 231, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(110, 231, 255, 0.04) 1px, transparent 1px);
+    linear-gradient(rgba(46, 217, 157, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(46, 217, 157, 0.04) 1px, transparent 1px);
   background-size: 28px 28px;
   mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
   pointer-events: none;
@@ -65,8 +65,8 @@ body::before {
   padding: 24px 26px;
   border: 1px solid var(--border);
   border-radius: 24px;
-  background: rgba(10, 16, 27, 0.72);
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25), 0 0 30px rgba(110, 231, 255, 0.08);
+  background: rgba(9, 12, 14, 0.82);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.38), 0 0 28px rgba(46, 217, 157, 0.12);
   backdrop-filter: blur(12px);
 }
 
@@ -88,7 +88,7 @@ h1 {
   line-height: 0.95;
   letter-spacing: -0.08em;
   text-transform: uppercase;
-  text-shadow: 0 0 18px rgba(110, 231, 255, 0.45);
+  text-shadow: 0 0 18px rgba(46, 217, 157, 0.5);
 }
 
 .subtitle {
@@ -104,21 +104,21 @@ h1 {
   height: 52px;
   border: 1px solid var(--border-strong);
   border-radius: 14px;
-  background: linear-gradient(135deg, rgba(110, 231, 255, 0.1), rgba(124, 77, 255, 0.2));
+  background: linear-gradient(135deg, rgba(46, 217, 157, 0.12), rgba(0, 0, 0, 0.65));
   color: var(--text);
   font-size: 1.7rem;
   cursor: pointer;
   transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-  box-shadow: 0 0 18px rgba(110, 231, 255, 0.12);
+  box-shadow: 0 0 18px rgba(46, 217, 157, 0.12);
   flex-shrink: 0;
 }
 
 .refresh-button:hover,
 .refresh-button:focus-visible {
-  background: linear-gradient(135deg, rgba(110, 231, 255, 0.18), rgba(124, 77, 255, 0.3));
-  border-color: rgba(110, 231, 255, 0.75);
+  background: linear-gradient(135deg, rgba(46, 217, 157, 0.2), rgba(0, 0, 0, 0.72));
+  border-color: rgba(46, 217, 157, 0.8);
   transform: rotate(90deg) scale(1.04);
-  box-shadow: 0 0 18px rgba(110, 231, 255, 0.28);
+  box-shadow: 0 0 18px rgba(46, 217, 157, 0.28);
 }
 
 .container {
@@ -157,8 +157,8 @@ h1 {
 }
 
 .search-container input:focus {
-  border-color: rgba(110, 231, 255, 0.7);
-  box-shadow: 0 0 0 4px rgba(110, 231, 255, 0.12);
+  border-color: rgba(46, 217, 157, 0.72);
+  box-shadow: 0 0 0 4px rgba(46, 217, 157, 0.12);
   background: rgba(13, 18, 31, 0.95);
 }
 
@@ -212,7 +212,7 @@ h1 {
   top: -96px;
   right: -70px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(110, 231, 255, 0.5), rgba(124, 77, 255, 0.45));
+  background: linear-gradient(135deg, rgba(46, 217, 157, 0.5), rgba(0, 0, 0, 0.2));
   opacity: 0.14;
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
@@ -220,9 +220,9 @@ h1 {
 .page-card:hover,
 .page-card:focus-visible {
   transform: translateY(-5px);
-  border-color: rgba(110, 231, 255, 0.6);
-  background: linear-gradient(180deg, rgba(24, 38, 61, 1), rgba(16, 24, 36, 1));
-  box-shadow: 0 20px 32px rgba(0, 0, 0, 0.28), 0 0 30px rgba(110, 231, 255, 0.12);
+  border-color: rgba(46, 217, 157, 0.6);
+  background: linear-gradient(180deg, rgba(17, 22, 25, 1), rgba(10, 14, 17, 1));
+  box-shadow: 0 20px 32px rgba(0, 0, 0, 0.38), 0 0 30px rgba(46, 217, 157, 0.12);
 }
 
 .page-card:hover::before,
@@ -247,11 +247,11 @@ h1 {
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(110, 231, 255, 0.2), rgba(124, 77, 255, 0.24));
+  background: linear-gradient(135deg, rgba(46, 217, 157, 0.14), rgba(0, 0, 0, 0.7));
   color: var(--accent);
   font-size: 1.2rem;
   font-weight: 900;
-  border: 1px solid rgba(110, 231, 255, 0.2);
+  border: 1px solid rgba(46, 217, 157, 0.22);
 }
 
 .card-arrow {
@@ -337,7 +337,7 @@ h1 {
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
-  box-shadow: 0 0 18px rgba(110, 231, 255, 0.2);
+  box-shadow: 0 0 18px rgba(46, 217, 157, 0.2);
 }
 
 @keyframes spin {
@@ -365,18 +365,18 @@ h1 {
   padding: 12px 20px;
   border: 0;
   border-radius: 12px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #08111b;
+  background: linear-gradient(135deg, var(--accent), #0d0f12);
+  color: #07110d;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 12px 25px rgba(108, 99, 255, 0.28);
+  box-shadow: 0 12px 25px rgba(46, 217, 157, 0.28);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .retry-button:hover,
 .retry-button:focus-visible {
   transform: translateY(-1px);
-  box-shadow: 0 16px 28px rgba(108, 99, 255, 0.38);
+  box-shadow: 0 16px 28px rgba(46, 217, 157, 0.38);
 }
 
 .hidden {
