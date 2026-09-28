@@ -1,98 +1,67 @@
 <!DOCTYPE html>
-
 <html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nanogames Arcade</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-```
-<title>Meine Webseiten</title>
-
-<link rel="stylesheet" href="style.css">
-```
-
-</head>
-
-<body>
-
-```
-<header class="header">
-    <div class="header-content">
-        <div>
-            <p class="eyebrow">DASHBOARD</p>
-            <h1>Meine Webseiten</h1>
-            <p class="subtitle">
-                Alle Projekte und Seiten an einem Ort.
-            </p>
+  <body>
+    <header class="header">
+      <div class="header-content">
+        <div class="title-wrap">
+          <p class="eyebrow">ARCADE HUB</p>
+          <h1>Nanogames</h1>
+          <p class="subtitle">Deine Mini-Games und Web-Projekte in einem neonblauen Battle Deck.</p>
         </div>
 
-        <button id="refreshButton" class="refresh-button" title="Seiten neu laden">
-            ↻
+        <button id="refreshButton" class="refresh-button" title="Seiten neu laden" aria-label="Seiten neu laden">
+          ↻
         </button>
-    </div>
-</header>
+      </div>
+    </header>
 
-
-<main class="container">
-
-    <div class="toolbar">
+    <main class="container">
+      <div class="toolbar">
         <div class="search-container">
-            <span class="search-icon">⌕</span>
-            <input
-                type="search"
-                id="searchInput"
-                placeholder="Seiten durchsuchen..."
-                autocomplete="off"
-            >
+          <span class="search-icon">⌕</span>
+          <input
+            type="search"
+            id="searchInput"
+            placeholder="Spiele durchsuchen..."
+            autocomplete="off"
+          />
         </div>
 
-        <div id="pageCount" class="page-count">
-            Lade Seiten...
-        </div>
-    </div>
+        <div id="pageCount" class="page-count">Lade Spiele...</div>
+      </div>
 
-
-    <div id="loading" class="status">
+      <div id="loading" class="status">
         <div class="loader"></div>
-        <p>Lade Webseiten...</p>
-    </div>
+        <p>Arsenal wird geladen...</p>
+      </div>
 
-
-    <div id="error" class="status error hidden">
+      <div id="error" class="status error hidden">
         <div class="status-icon">!</div>
         <h2>Seiten konnten nicht geladen werden</h2>
-        <p id="errorMessage">
-            Es ist ein Fehler aufgetreten.
-        </p>
-        <button id="retryButton" class="retry-button">
-            Erneut versuchen
-        </button>
-    </div>
+        <p id="errorMessage">Es ist ein Fehler aufgetreten.</p>
+        <button id="retryButton" class="retry-button">Erneut versuchen</button>
+      </div>
 
-
-    <div id="empty" class="status hidden">
+      <div id="empty" class="status hidden">
         <div class="status-icon">○</div>
-        <h2>Keine Seiten gefunden</h2>
-        <p>
-            Im Ordner <code>games/</code> wurden keine HTML-Dateien gefunden.
-        </p>
-    </div>
+        <h2>Keine Spiele gefunden</h2>
+        <p>Im Ordner <code>games/</code> wurden keine HTML-Dateien gefunden.</p>
+      </div>
 
+      <section id="pageGrid" class="page-grid"></section>
+    </main>
 
-    <section id="pageGrid" class="page-grid"></section>
+    <footer class="footer">
+      <p><span id="lastUpdated">Zuletzt aktualisiert: –</span></p>
+    </footer>
 
-</main>
-
-
-<footer class="footer">
-    <p>
-        <span id="lastUpdated">Zuletzt aktualisiert: –</span>
-    </p>
-</footer>
-
-
-<script src="dashboard.js"></script>
-```
-
-</body>
+    <script src="dashboard.js"></script>
+  </body>
 </html>
