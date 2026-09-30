@@ -28,8 +28,6 @@ const empty = document.getElementById("empty");
 
 const searchInput = document.getElementById("searchInput");
 const pageCount = document.getElementById("pageCount");
-const favoritesFilterButton = document.getElementById("favoritesFilterButton");
-const favoritesCount = document.getElementById("favoritesCount");
 
 const refreshButton = document.getElementById("refreshButton");
 const retryButton = document.getElementById("retryButton");
@@ -37,61 +35,12 @@ const retryButton = document.getElementById("retryButton");
 const lastUpdated = document.getElementById("lastUpdated");
 
 const STORAGE_KEY = "nanogames.cachedPages";
-const FAVORITES_STORAGE_KEY = "nanogames.favoritePages";
 const CACHE_TTL_MS = 10 * 60 * 1000;
 const REFRESH_COOLDOWN_MS = 2500;
 
 // Alle gefundenen Seiten
 let pages = [];
-let favoritePages = readFavoritePages();
-let favoritesOnly = false;
 let lastRefreshRequest = 0;
-
-function readFavoritePages() {
-    try {
-        const stored = JSON.parse(window.localStorage.getItem(FAVORITES_STORAGE_KEY) || "[]");
-        return new Set(Array.isArray(stored) ? stored.filter(url => typeof url === "string") : []);
-    } catch (error) {
-        console.warn("Favoriten konnten nicht gelesen werden.", error);
-        return new Set();
-    }
-}
-
-function saveFavoritePages() {
-    try {
-        window.localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify([...favoritePages]));
-    } catch (error) {
-        console.warn("Favoriten konnten nicht gespeichert werden.", error);
-    }
-}
-
-function toggleFavorite(page) {
-    if (favoritePages.has(page.url)) {
-        favoritePages.delete(page.url);
-    } else {
-        favoritePages.add(page.url);
-    }
-
-    saveFavoritePages();
-    renderVisiblePages();
-}
-
-function renderVisiblePages() {
-    const query = searchInput.value.trim().toLowerCase();
-    const filtered = pages.filter(page => {
-        const matchesQuery =
-            page.title.toLowerCase().includes(query) ||
-            page.description.toLowerCase().includes(query) ||
-            page.name.toLowerCase().includes(query);
-
-        return matchesQuery && (!favoritesOnly || favoritePages.has(page.url));
-    });
-
-    favoritesFilterButton.setAttribute("aria-pressed", String(favoritesOnly));
-    favoritesCount.textContent = String(favoritePages.size);
-    renderPages(filtered);
-    updatePageCount(filtered.length);
-}
 
 function readCachedPages() {
     try {
@@ -384,16 +333,14 @@ async function loadPages({ force = false } = {}) {
 
 function renderPages(pageList) {
     pageGrid.innerHTML = "";
-    favoritesCount.textContent = String(favoritePages.size);
-    favoritesFilterButton.setAttribute("aria-pressed", String(favoritesOnly));
 
     if (pageList.length === 0) {
         pageGrid.innerHTML = `
             <div class="status">
-                <div class="status-icon">${favoritesOnly ? "☆" : "⌕"}</div>
+                <div class="status-icon">⌕</div>
                 <h2>Keine Ergebnisse</h2>
                 <p>
-                    ${favoritesOnly ? "Du hast noch keine passenden Favoriten." : "Keine Seite passt zu deiner Suche."}
+                    Keine Seite passt zu deiner Suche.
                 </p>
             </div>
         `;
@@ -403,24 +350,37 @@ function renderPages(pageList) {
     }
 
     pageList.forEach(page => {
-        const cardWrapper = document
-            .getElementById("pageCardTemplate")
-            .content.firstElementChild.cloneNode(true);
-        const card = cardWrapper.querySelector(".page-card");
+        const card = document.createElement("a");
+        card.className = "page-card";
         card.href = page.url;
-        card.querySelector(".card-title").textContent = page.title;
-        card.querySelector(".card-description").textContent = page.description;
-        card.querySelector(".card-path").textContent = page.name;
 
-        const favoriteButton = cardWrapper.querySelector(".favorite-button");
-        const isFavorite = favoritePages.has(page.url);
-        favoriteButton.textContent = isFavorite ? "★" : "☆";
-        favoriteButton.setAttribute("aria-label", `${isFavorite ? "Aus Favoriten entfernen:" : "Zu Favoriten hinzufügen:"} ${page.title}`);
-        favoriteButton.setAttribute("aria-pressed", String(isFavorite));
-        favoriteButton.title = isFavorite ? "Aus Favoriten entfernen" : "Zu Favoriten hinzufügen";
-        favoriteButton.addEventListener("click", () => toggleFavorite(page));
+        card.innerHTML = `
+            <div>
+                <div class="card-top">
+                    <div class="card-icon">
+                        🎮
+                    </div>
 
-        pageGrid.appendChild(cardWrapper);
+                    <div class="card-arrow">
+                        →
+                    </div>
+                </div>
+
+                <h2 class="card-title">
+                    ${escapeHTML(page.title)}
+                </h2>
+
+                <p class="card-description">
+                    ${escapeHTML(page.description)}
+                </p>
+            </div>
+
+            <div class="card-path">
+                ${escapeHTML(page.name)}
+            </div>
+        `;
+
+        pageGrid.appendChild(card);
     });
 
     hideLoading();
@@ -431,12 +391,24 @@ function renderPages(pageList) {
 // ==========================================
 
 searchInput.addEventListener("input", () => {
-    renderVisiblePages();
-});
+    const query = searchInput.value.trim().toLowerCase();
 
-favoritesFilterButton.addEventListener("click", () => {
-    favoritesOnly = !favoritesOnly;
-    renderVisiblePages();
+    if (!query) {
+        renderPages(pages);
+        updatePageCount();
+        return;
+    }
+
+    const filtered = pages.filter(page => {
+        return (
+            page.title.toLowerCase().includes(query) ||
+            page.description.toLowerCase().includes(query) ||
+            page.name.toLowerCase().includes(query)
+        );
+    });
+
+    renderPages(filtered);
+    updatePageCount(filtered.length);
 });
 
 // ==========================================
