@@ -403,50 +403,23 @@ function renderPages(pageList) {
     }
 
     pageList.forEach(page => {
-        const cardWrapper = document.createElement("div");
-        cardWrapper.className = "page-card-wrapper";
-
-        const card = document.createElement("a");
-        card.className = "page-card";
+        const cardWrapper = document
+            .getElementById("pageCardTemplate")
+            .content.firstElementChild.cloneNode(true);
+        const card = cardWrapper.querySelector(".page-card");
         card.href = page.url;
+        card.querySelector(".card-title").textContent = page.title;
+        card.querySelector(".card-description").textContent = page.description;
+        card.querySelector(".card-path").textContent = page.name;
 
-        card.innerHTML = `
-            <div>
-                <div class="card-top">
-                    <div class="card-icon">
-                        🎮
-                    </div>
-
-                    <div class="card-arrow">
-                        →
-                    </div>
-                </div>
-
-                <h2 class="card-title">
-                    ${escapeHTML(page.title)}
-                </h2>
-
-                <p class="card-description">
-                    ${escapeHTML(page.description)}
-                </p>
-            </div>
-
-            <div class="card-path">
-                ${escapeHTML(page.name)}
-            </div>
-        `;
-
-        const favoriteButton = document.createElement("button");
+        const favoriteButton = cardWrapper.querySelector(".favorite-button");
         const isFavorite = favoritePages.has(page.url);
-        favoriteButton.className = "favorite-button";
-        favoriteButton.type = "button";
         favoriteButton.textContent = isFavorite ? "★" : "☆";
         favoriteButton.setAttribute("aria-label", `${isFavorite ? "Aus Favoriten entfernen:" : "Zu Favoriten hinzufügen:"} ${page.title}`);
         favoriteButton.setAttribute("aria-pressed", String(isFavorite));
         favoriteButton.title = isFavorite ? "Aus Favoriten entfernen" : "Zu Favoriten hinzufügen";
         favoriteButton.addEventListener("click", () => toggleFavorite(page));
 
-        cardWrapper.append(card, favoriteButton);
         pageGrid.appendChild(cardWrapper);
     });
 

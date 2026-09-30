@@ -12,6 +12,7 @@
   --accent: #2ed99d;
   --accent-2: #1ebf88;
   --accent-3: #0f5d45;
+  --favorite: #ffd166;
   --danger: #ff5f7a;
   --glow: rgba(46, 217, 157, 0.42);
   --shadow: rgba(0, 0, 0, 0.72);
@@ -182,32 +183,37 @@ h1 {
 }
 
 .favorites-filter {
-  min-height: 48px;
-  padding: 0 16px;
+  min-height: 52px;
+  padding: 0 18px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: rgba(17, 24, 39, 0.8);
-  color: var(--text-muted);
+  border: 1px solid rgba(255, 209, 102, 0.42);
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 209, 102, 0.12), rgba(17, 24, 39, 0.88));
+  color: var(--text);
   font: inherit;
   font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
-  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
 }
 
 .favorites-filter span:first-child {
-  color: var(--accent);
-  font-size: 1.2rem;
+  color: var(--favorite);
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.favorites-filter:hover {
+  transform: translateY(-1px);
+  border-color: var(--favorite);
 }
 
 .favorites-filter[aria-pressed="true"] {
-  border-color: var(--border-strong);
-  background: rgba(46, 217, 157, 0.12);
-  color: var(--text);
+  border-color: var(--favorite);
+  background: rgba(255, 209, 102, 0.2);
 }
 
 .favorites-filter:focus-visible,
@@ -254,18 +260,18 @@ h1 {
 
 .favorite-button {
   position: absolute;
-  top: 25px;
-  right: 18px;
+  top: 23px;
+  right: 20px;
   z-index: 2;
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   display: grid;
   place-items: center;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: rgba(5, 8, 11, 0.76);
+  border: 1px solid rgba(255, 209, 102, 0.38);
+  border-radius: 50%;
+  background: rgba(5, 8, 11, 0.84);
   color: var(--text-muted);
-  font-size: 1.35rem;
+  font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
   transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
@@ -273,9 +279,9 @@ h1 {
 
 .favorite-button:hover,
 .favorite-button[aria-pressed="true"] {
-  border-color: var(--accent);
-  background: rgba(46, 217, 157, 0.14);
-  color: var(--accent);
+  border-color: var(--favorite);
+  background: rgba(255, 209, 102, 0.16);
+  color: var(--favorite);
 }
 
 .favorite-button:hover {
@@ -536,8 +542,8 @@ h1 {
   }
 
   .favorite-button {
-    top: 20px;
-    right: 14px;
+    top: 17px;
+    right: 16px;
   }
 
   .card-title {
