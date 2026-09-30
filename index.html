@@ -34,12 +34,6 @@
           />
         </div>
 
-        <button id="favoritesFilterButton" class="favorites-filter" type="button" aria-pressed="false">
-          <span aria-hidden="true">☆</span>
-          Favoriten
-          <span id="favoritesCount" class="favorites-count">0</span>
-        </button>
-
         <div id="pageCount" class="page-count">Lade Spiele...</div>
       </div>
 
@@ -60,23 +54,6 @@
         <h2>Keine Spiele gefunden</h2>
         <p>Im Ordner <code>games/</code> wurden keine HTML-Dateien gefunden.</p>
       </div>
-
-      <template id="pageCardTemplate">
-        <div class="page-card-wrapper">
-          <a class="page-card" href="">
-            <div>
-              <div class="card-top">
-                <div class="card-icon">🎮</div>
-                <div class="card-arrow">→</div>
-              </div>
-              <h2 class="card-title"></h2>
-              <p class="card-description"></p>
-            </div>
-            <div class="card-path"></div>
-          </a>
-          <button class="favorite-button" type="button" aria-pressed="false" aria-label="Zu Favoriten hinzufügen" title="Zu Favoriten hinzufügen">☆</button>
-        </div>
-      </template>
 
       <section id="pageGrid" class="page-grid"></section>
     </main>
