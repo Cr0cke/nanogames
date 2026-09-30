@@ -28,6 +28,8 @@ const empty = document.getElementById("empty");
 
 const searchInput = document.getElementById("searchInput");
 const pageCount = document.getElementById("pageCount");
+const favoritesFilterButton = document.getElementById("favoritesFilterButton");
+const favoritesCount = document.getElementById("favoritesCount");
 
 const refreshButton = document.getElementById("refreshButton");
 const retryButton = document.getElementById("retryButton");
@@ -35,12 +37,61 @@ const retryButton = document.getElementById("retryButton");
 const lastUpdated = document.getElementById("lastUpdated");
 
 const STORAGE_KEY = "nanogames.cachedPages";
+const FAVORITES_STORAGE_KEY = "nanogames.favoritePages";
 const CACHE_TTL_MS = 10 * 60 * 1000;
 const REFRESH_COOLDOWN_MS = 2500;
 
 // Alle gefundenen Seiten
 let pages = [];
+let favoritePages = readFavoritePages();
+let favoritesOnly = false;
 let lastRefreshRequest = 0;
+
+function readFavoritePages() {
+    try {
+        const stored = JSON.parse(window.localStorage.getItem(FAVORITES_STORAGE_KEY) || "[]");
+        return new Set(Array.isArray(stored) ? stored.filter(url => typeof url === "string") : []);
+    } catch (error) {
+        console.warn("Favoriten konnten nicht gelesen werden.", error);
+        return new Set();
+    }
+}
+
+function saveFavoritePages() {
+    try {
+        window.localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify([...favoritePages]));
+    } catch (error) {
+        console.warn("Favoriten konnten nicht gespeichert werden.", error);
+    }
+}
+
+function toggleFavorite(page) {
+    if (favoritePages.has(page.url)) {
+        favoritePages.delete(page.url);
+    } else {
+        favoritePages.add(page.url);
+    }
+
+    saveFavoritePages();
+    renderVisiblePages();
+}
+
+function renderVisiblePages() {
+    const query = searchInput.value.trim().toLowerCase();
+    const filtered = pages.filter(page => {
+        const matchesQuery =
+            page.title.toLowerCase().includes(query) ||
+            page.description.toLowerCase().includes(query) ||
+            page.name.toLowerCase().includes(query);
+
+        return matchesQuery && (!favoritesOnly || favoritePages.has(page.url));
+    });
+
+    favoritesFilterButton.setAttribute("aria-pressed", String(favoritesOnly));
+    favoritesCount.textContent = String(favoritePages.size);
+    renderPages(filtered);
+    updatePageCount(filtered.length);
+}
 
 function readCachedPages() {
     try {
@@ -333,14 +384,16 @@ async function loadPages({ force = false } = {}) {
 
 function renderPages(pageList) {
     pageGrid.innerHTML = "";
+    favoritesCount.textContent = String(favoritePages.size);
+    favoritesFilterButton.setAttribute("aria-pressed", String(favoritesOnly));
 
     if (pageList.length === 0) {
         pageGrid.innerHTML = `
             <div class="status">
-                <div class="status-icon">⌕</div>
+                <div class="status-icon">${favoritesOnly ? "☆" : "⌕"}</div>
                 <h2>Keine Ergebnisse</h2>
                 <p>
-                    Keine Seite passt zu deiner Suche.
+                    ${favoritesOnly ? "Du hast noch keine passenden Favoriten." : "Keine Seite passt zu deiner Suche."}
                 </p>
             </div>
         `;
@@ -350,6 +403,9 @@ function renderPages(pageList) {
     }
 
     pageList.forEach(page => {
+        const cardWrapper = document.createElement("div");
+        cardWrapper.className = "page-card-wrapper";
+
         const card = document.createElement("a");
         card.className = "page-card";
         card.href = page.url;
@@ -358,7 +414,7 @@ function renderPages(pageList) {
             <div>
                 <div class="card-top">
                     <div class="card-icon">
-                        &lt;/&gt;
+                        🎮
                     </div>
 
                     <div class="card-arrow">
@@ -380,7 +436,18 @@ function renderPages(pageList) {
             </div>
         `;
 
-        pageGrid.appendChild(card);
+        const favoriteButton = document.createElement("button");
+        const isFavorite = favoritePages.has(page.url);
+        favoriteButton.className = "favorite-button";
+        favoriteButton.type = "button";
+        favoriteButton.textContent = isFavorite ? "★" : "☆";
+        favoriteButton.setAttribute("aria-label", `${isFavorite ? "Aus Favoriten entfernen:" : "Zu Favoriten hinzufügen:"} ${page.title}`);
+        favoriteButton.setAttribute("aria-pressed", String(isFavorite));
+        favoriteButton.title = isFavorite ? "Aus Favoriten entfernen" : "Zu Favoriten hinzufügen";
+        favoriteButton.addEventListener("click", () => toggleFavorite(page));
+
+        cardWrapper.append(card, favoriteButton);
+        pageGrid.appendChild(cardWrapper);
     });
 
     hideLoading();
@@ -391,24 +458,12 @@ function renderPages(pageList) {
 // ==========================================
 
 searchInput.addEventListener("input", () => {
-    const query = searchInput.value.trim().toLowerCase();
+    renderVisiblePages();
+});
 
-    if (!query) {
-        renderPages(pages);
-        updatePageCount();
-        return;
-    }
-
-    const filtered = pages.filter(page => {
-        return (
-            page.title.toLowerCase().includes(query) ||
-            page.description.toLowerCase().includes(query) ||
-            page.name.toLowerCase().includes(query)
-        );
-    });
-
-    renderPages(filtered);
-    updatePageCount(filtered.length);
+favoritesFilterButton.addEventListener("click", () => {
+    favoritesOnly = !favoritesOnly;
+    renderVisiblePages();
 });
 
 // ==========================================
